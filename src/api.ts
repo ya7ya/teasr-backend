@@ -187,7 +187,10 @@ export async function start() {
     cors({
       origin: [
         "http://localhost:3000",
+        "http://localhost:3002",
         "http://localhost:4783",
+        "https://teasr.xyz",
+        "https://www.teasr.xyz",
         "*",
         /vercel\.app$/,
       ],
