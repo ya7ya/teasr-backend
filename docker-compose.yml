@@ -1,0 +1,52 @@
+version: '3.5'
+
+services:
+  postgres:
+    image: postgres:15.0-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    networks:
+      - dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  # server:
+  #   build: 
+  #     context: "."
+  #     dockerfile: Dockerfile
+  #   # container_name: listener
+  #   command: ["node", "packages/relay/dist/src/server.js"]
+  #   restart: always
+  #   ports:
+  #     - 4000:4000
+  #   networks:
+  #     - dev-network
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   environment:
+  #     - POSTGRES_HOST=postgres
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #     - POSTGRES_DB=postgres
+  #     - POSTGRES_PORT=5432
+  #     - PROVIDER_URL=https://rpc-mumbai.maticvigil.com
+  #     - PK=
+  #     - ZK3_CONTRACT_ADDRESS=0x
+  #     - LENS_HUB_CONTRACT_ADDRESS=0x60Ae865ee4C725cd04353b5AAb364553f56ceF82
+  #     - SALT=39vnitnvp4i5u8vnp45ivp594gg45guhp45ighbp45vih4pnv
+  #     - COORDINATOR=0xe5A8480f4048a46B12Ac2e78A84455c57eCcC141
+  #     - NETWORK=mumbai
+
+networks:
+  dev-network:
+    driver: bridge
