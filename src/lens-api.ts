@@ -7,7 +7,7 @@ import {
 } from "@apollo/client";
 import { BigNumberish } from "ethers";
 
-const APIURL = process.env.LENS_API_URL || "https://api-mumbai.lens.dev";
+const APIURL = process.env.LENS_API_URL || "https://api.lens.dev";
 const httpLink = new HttpLink({ uri: APIURL });
 const authLink = new ApolloLink((operation, forward) => {
   // add the authorization to the headers

@@ -35,10 +35,10 @@ dotenv.config();
 const typeDefs = `#graphql
 
   type Reputation {
-    id: String!
-    reputation: Int!
-    createdAt: String!
-    updatedAt: String!
+    id: String
+    score: Float
+    createdAt: String
+    updatedAt: String
   }
 
   type AbsStats {
@@ -65,23 +65,22 @@ const typeDefs = `#graphql
   }
 
   type Query {
-    profileReputation(id: String!): Stats
-    publicationReputation(id: String!): Reputation
-    pubStats(publicationId: String!): String
-    profileStats(profileId: String!): AbsStats
-    profileRecations(profileId: String!): String
+    profileScore(profileId: String!): Reputation
+    profileStats(profileId: String!): Stats
+    publicationScore(id: String!): Reputation
+    publicationStats(publicationId: String!): String
   }
 `;
 
 const resolvers = {
   Query: {
-    profileReputation: async (
+    profileStats: async (
       _parent: any,
-      { id }: { id: string },
+      { profileId }: { profileId: string },
       _context: GraphQLServerContext
     ) => {
       try {
-        const stats = await getProfileContentStats(id);
+        const stats = await getProfileContentStats(profileId);
         console.log("commentStats", stats);
         return stats;
       } catch (e) {
@@ -89,14 +88,14 @@ const resolvers = {
         return null;
       }
     },
-    publicationReputation: async (
+    publicationScore: async (
       _parent: any,
       { id }: { id: string },
       _context: GraphQLServerContext
     ) => {
       return getUserReputation(id);
     },
-    pubStats: async (
+    publicationStats: async (
       _parent: any,
       { publicationId }: { publicationId: string },
       _context: GraphQLServerContext
@@ -106,7 +105,7 @@ const resolvers = {
       console.log("pubStats", pubStats);
       return JSON.stringify(pubStats);
     },
-    profileStats: async (
+    profileScore: async (
       _parent: any,
       { profileId }: { profileId: string },
       _context: GraphQLServerContext
@@ -146,16 +145,12 @@ const resolvers = {
       const score = await calculateReputationScore(metrics);
       // console.log("profileStats", publication);
       // return JSON.stringify(publication);
-      return score;
-    },
-    profileRecations: async (
-      _parent: any,
-      { profileId }: { profileId: string },
-      _context: GraphQLServerContext
-    ) => {
-      const publication = await getPublicationsReaction(profileId);
-      console.log("profileRecations", publication);
-      return JSON.stringify(publication);
+      return {
+        id: profileId,
+        score: score,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
     },
   },
 };
