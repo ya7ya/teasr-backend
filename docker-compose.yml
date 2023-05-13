@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
     ports:
-      - 5432:5432
+      - 5433:5432
     volumes:
       - ./postgres:/var/lib/postgresql/data
     networks:
@@ -23,10 +23,10 @@ services:
     build: 
       context: "."
       dockerfile: Dockerfile
-    command: ["node", "dist/server.js"]
+    command: ["node", "/app/dist/server.js"]
     restart: always
     ports:
-      - 4000:4000
+      - 4001:4000
     networks:
       - teasr-network
     depends_on:
@@ -39,7 +39,6 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_PORT=5432
       - PROVIDER_URL=https://rpc-mumbai.maticvigil.com
-      - PK=
       - LENS_HUB_CONTRACT_ADDRESS=0x60Ae865ee4C725cd04353b5AAb364553f56ceF82
       - NETWORK=mumbai
 

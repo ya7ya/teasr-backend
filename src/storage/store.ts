@@ -12,7 +12,8 @@ const poolConfig = {
   password: process.env.POSTGRES_PASSWORD || "postgres",
   port: process.env.POSTGRES_PORT ? parseInt(process.env.POSTGRES_PORT) : 5432,
 };
-// console.log('pool config', poolConfig);
+
+console.log("pool config", poolConfig);
 // pools will use environment variables
 // for connection information
 const pool = new Pool(poolConfig);

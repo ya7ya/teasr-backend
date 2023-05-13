@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "outDir": "dist",
     "useUnknownInCatchVariables": false,
-    "types": ["jest", "node"]
+    "types": ["node"]
     // "typeRoots": ["src/types", "./node_modules/@types"]
   },
   "include": ["src/**/*.ts"],
