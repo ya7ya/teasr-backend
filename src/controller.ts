@@ -112,13 +112,14 @@ export async function getProfileContentStats(profileId: string) {
 
   const publicationsStats = publications.map((publication) => {
     if (!publication || !publication.id) return null;
-    // console.log("publication", publication);
+    console.log("publication", publication);
     return {
       pubId: publication.id,
       mirrors: publication.totalAmountOfMirrors,
       collects: publication.totalAmountOfCollects,
       comments: publication.totalAmountOfComments,
-      likes: publication.totalAmountOfUpvotes,
+      likes: publication.totalUpvotes,
+      dislikes: publication.totalDownvotes,
     };
   });
 
