@@ -17,7 +17,14 @@ import { json } from "body-parser";
 import { v4 } from "uuid";
 
 import { initialize, dbStop, getUserReputation } from "./storage/store";
-import { verifyJwt } from "./lens-api";
+import {
+  getProfilePublications,
+  getProfileStats,
+  getPublicationStats,
+  getPublicationsReaction,
+  verifyJwt,
+} from "./lens-api";
+import { calculateReputationScore } from "./controller";
 
 dotenv.config();
 
@@ -34,9 +41,22 @@ const typeDefs = `#graphql
     updatedAt: String!
   }
 
+  type Stats {
+    totalFollowers: Int
+    totalFollowing: Int
+    totalPosts: Int
+    totalComments: Int
+    totalMirrors: Int
+    totalPublications: Int
+    totalCollects: Int
+  }
+
   type Query {
     profileReputation(id: String!): Reputation
     publicationReputation(id: String!): Reputation
+    pubStats(publicationId: String!): String
+    profileStats(profileId: String!): Stats
+    profileRecations(profileId: String!): String
   }
 `;
 
@@ -55,6 +75,67 @@ const resolvers = {
       _context: GraphQLServerContext
     ) => {
       return getUserReputation(id);
+    },
+    pubStats: async (
+      _parent: any,
+      { publicationId }: { publicationId: string },
+      _context: GraphQLServerContext
+    ) => {
+      const publication = await getPublicationStats(publicationId);
+      const pubStats = publication?.data?.publication?.stats;
+      console.log("pubStats", pubStats);
+      return JSON.stringify(pubStats);
+    },
+    profileStats: async (
+      _parent: any,
+      { profileId }: { profileId: string },
+      _context: GraphQLServerContext
+    ) => {
+      const stats = await getProfileStats(profileId);
+      const metrics = [
+        {
+          label: "totalFollowers",
+          value: (stats?.totalFollowers as number) || 0,
+        },
+        {
+          label: "totalFollowing",
+          value: (stats?.totalFollowing as number) || 0,
+        },
+        {
+          label: "totalPosts",
+          value: (stats?.totalPosts as number) || 0,
+        },
+        {
+          label: "totalComments",
+          value: (stats?.totalComments as number) || 0,
+        },
+        {
+          label: "totalMirrors",
+          value: (stats?.totalMirrors as number) || 0,
+        },
+        {
+          label: "totalPublications",
+          value: (stats?.totalPublications as number) || 0,
+        },
+        {
+          label: "totalCollects",
+          value: (stats?.totalCollects as number) || 0,
+        },
+      ];
+
+      const score = await calculateReputationScore(metrics);
+      // console.log("profileStats", publication);
+      // return JSON.stringify(publication);
+      return score;
+    },
+    profileRecations: async (
+      _parent: any,
+      { profileId }: { profileId: string },
+      _context: GraphQLServerContext
+    ) => {
+      const publication = await getPublicationsReaction(profileId);
+      console.log("profileRecations", publication);
+      return JSON.stringify(publication);
     },
   },
 };

@@ -2,7 +2,7 @@
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
     "lib": ["es2020"],
-    "target": "ES2020",
+    "target": "ESNext",
     "noImplicitAny": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -12,7 +12,10 @@
     "resolveJsonModule": true,
     "outDir": "dist",
     "useUnknownInCatchVariables": false,
-    "types": ["node"]
+    "types": ["node"],
+    "sourceMap": true,
+    "declaration": true
+    // "module": "es2015"
     // "typeRoots": ["src/types", "./node_modules/@types"]
   },
   "include": ["src/**/*.ts"],
