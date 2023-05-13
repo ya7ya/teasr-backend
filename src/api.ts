@@ -24,7 +24,7 @@ import {
   getPublicationsReaction,
   verifyJwt,
 } from "./lens-api";
-import { calculateReputationScore } from "./controller";
+import { calculateReputationScore, getProfileContentStats } from "./controller";
 
 dotenv.config();
 
@@ -41,7 +41,7 @@ const typeDefs = `#graphql
     updatedAt: String!
   }
 
-  type Stats {
+  type AbsStats {
     totalFollowers: Int
     totalFollowing: Int
     totalPosts: Int
@@ -51,11 +51,24 @@ const typeDefs = `#graphql
     totalCollects: Int
   }
 
+  type Metric {
+    mean: Float
+    median: Float
+    std: Float
+  }
+
+  type Stats {
+    likes: Metric
+    comments: Metric
+    mirrors: Metric
+    collects: Metric
+  }
+
   type Query {
-    profileReputation(id: String!): Reputation
+    profileReputation(id: String!): Stats
     publicationReputation(id: String!): Reputation
     pubStats(publicationId: String!): String
-    profileStats(profileId: String!): Stats
+    profileStats(profileId: String!): AbsStats
     profileRecations(profileId: String!): String
   }
 `;
@@ -67,7 +80,14 @@ const resolvers = {
       { id }: { id: string },
       _context: GraphQLServerContext
     ) => {
-      return getUserReputation(id);
+      try {
+        const stats = await getProfileContentStats(id);
+        console.log("commentStats", stats);
+        return stats;
+      } catch (e) {
+        console.log("error", e);
+        return null;
+      }
     },
     publicationReputation: async (
       _parent: any,

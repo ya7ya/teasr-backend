@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { getProfilePublications } from "./lens-api";
+import * as mathjs from "mathjs";
 
 export async function calculateReputationScore(
   metrics: { label: string; value: number }[]
@@ -110,14 +111,61 @@ export async function getProfileContentStats(profileId: string) {
   if (!publications) return null;
 
   const publicationsStats = publications.map((publication) => {
+    if (!publication || !publication.id) return null;
+    // console.log("publication", publication);
     return {
       pubId: publication.id,
-      mirrors: publication.stats.totalAmountOfMirrors,
-      collects: publication.stats.totalAmountOfCollects,
-      comments: publication.stats.totalAmountOfComments,
-      likes: publication.stats.totalAmountOfLikes,
+      mirrors: publication.totalAmountOfMirrors,
+      collects: publication.totalAmountOfCollects,
+      comments: publication.totalAmountOfComments,
+      likes: publication.totalAmountOfUpvotes,
     };
   });
+
+  const commentsArray = publicationsStats.map((publication) => {
+    return publication?.comments ?? 0;
+  });
+
+  const likesArray = publicationsStats.map((publication) => {
+    return publication?.likes ?? 0;
+  });
+
+  const mirrorsArray = publicationsStats.map((publication) => {
+    return publication?.mirrors ?? 0;
+  });
+
+  const collectsArray = publicationsStats.map((publication) => {
+    return publication?.collects ?? 0;
+  });
+
+  console.log("commentsArray", commentsArray);
+  console.log("comments", mathjs.mean(commentsArray));
+  console.log("likesArray", likesArray);
+  console.log("mirrorsArray", mirrorsArray);
+  // console.log("collectsArray", collectsArray);
+
+  return {
+    likes: {
+      mean: mathjs.mean(likesArray),
+      std: mathjs.std(likesArray),
+      median: mathjs.median(likesArray),
+    },
+    mirrors: {
+      mean: mathjs.mean(mirrorsArray),
+      std: mathjs.std(mirrorsArray),
+      median: mathjs.median(mirrorsArray),
+    },
+    collects: {
+      mean: mathjs.mean(collectsArray),
+      std: mathjs.std(collectsArray),
+      // median: mathjs.median(collectsArray),
+    },
+    comments: {
+      mean: mathjs.mean(commentsArray),
+      std: mathjs.std(commentsArray),
+      median: mathjs.median(commentsArray),
+    },
+  };
 }
 
 interface Point {
